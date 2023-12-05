@@ -49,5 +49,7 @@
 	<string>Want to display location on map, and track it.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Want to display location on map, and track it.</string>
+	<key>com.apple.security.network.client</key>
+	<true/>
 </dict>
 </plist>
