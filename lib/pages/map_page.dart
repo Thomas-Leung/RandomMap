@@ -9,7 +9,7 @@ import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:random_map/Model/place_model.dart';
+import 'package:random_map/models/place_model.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -21,27 +21,11 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final Location _locationController = Location();
 
-  static const LatLng _pGooglePlex = LatLng(37.4223, -122.0848);
+  static const LatLng _torontoLocation = LatLng(43.6510, -79.3470);
   LatLng? _currentPosition;
   List<Place> nearbyRestaurants = [];
   String randomRestaurant = "Loading...";
   LatLng? randomRestaurantPosition;
-  List<IconData> icons = [
-    Icons.menu_book_rounded,
-    Icons.storefront_rounded,
-    Icons.restaurant_menu_rounded,
-    Icons.restaurant_menu_rounded,
-    Icons.local_cafe_rounded,
-    Icons.ramen_dining_rounded,
-    Icons.local_dining_rounded,
-    Icons.takeout_dining_rounded,
-    Icons.dinner_dining_rounded,
-    Icons.table_restaurant_rounded,
-    Icons.set_meal_rounded,
-    Icons.tapas_rounded,
-    Icons.rice_bowl_rounded,
-    Icons.bento_rounded
-  ];
 
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
@@ -50,14 +34,12 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     getLocationUpdates();
-    pickARandomRestaurant();
+    // pickARandomRestaurant();
   }
 
   Future<void> pickARandomRestaurant() async {
     http.Response response = await searchNearbyRestaurants(
-        _currentPosition != null
-            ? _currentPosition!
-            : const LatLng(43.6510, -79.3470));
+        _currentPosition != null ? _currentPosition! : _torontoLocation);
     if (response.statusCode == 200) {
       Map<String, dynamic> result =
           jsonDecode(response.body) as Map<String, dynamic>;
@@ -102,72 +84,101 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _currentPosition == null
-          ? const Center(
-              child: Text("Loading..."),
-            )
-          : Stack(children: [
-              GoogleMap(
-                  // save to out controller so we have access to the location
-                  onMapCreated: ((GoogleMapController controller) =>
-                      _mapController.complete(controller)),
-                  initialCameraPosition: const CameraPosition(
-                    target: _pGooglePlex,
-                    zoom: 15,
-                  ),
-                  markers: {
-                    Marker(
-                        markerId: const MarkerId("_currentLocation"),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(240),
-                        position: _currentPosition!),
-                    Marker(
-                        markerId: const MarkerId("_sourceLocation"),
-                        icon: BitmapDescriptor.defaultMarker,
-                        position: randomRestaurantPosition!)
-                  }),
-              Positioned(
-                left: 16,
-                bottom: 16,
-                child: Card(
-                  elevation: 8.0,
-                  clipBehavior: Clip.hardEdge,
-                  color: Colors.black87,
-                  child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      child: Wrap(
-                        children: [
-                          ListTile(
-                            title: const Text(
-                              'Your ramdom nearby restaurant:',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            onTap: () async {
-                              await pickARandomRestaurant();
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterFloat,
+      floatingActionButton: Builder(builder: (context) {
+        return FloatingActionButton(
+            child: const Icon(Icons.expand_less_rounded),
+            onPressed: () {
+              Scaffold.of(context).showBottomSheet<void>(
+                (BuildContext context) {
+                  return Container(
+                    height: 200,
+                    color: Colors.amber,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Text('BottomSheet'),
+                          ElevatedButton(
+                            child: const Text('Close BottomSheet'),
+                            onPressed: () {
+                              Navigator.pop(context);
                             },
                           ),
-                          ListTile(
-                            leading: Icon(
-                              icons[Random().nextInt(icons.length)],
-                              color: Colors.white70,
-                            ),
-                            title: Text(
-                              randomRestaurant,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                            onTap: () async {
-                              await Clipboard.setData(
-                                  ClipboardData(text: randomRestaurant));
-                            },
-                          )
                         ],
-                      )),
-                ),
-              ),
-            ]),
+                      ),
+                    ),
+                  );
+                },
+              );
+            });
+      }),
+      body: Stack(children: [
+        GoogleMap(
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
+          zoomControlsEnabled: false,
+          // save to out controller so we have access to the location
+          onMapCreated: ((GoogleMapController controller) =>
+              _mapController.complete(controller)),
+          initialCameraPosition: const CameraPosition(
+            target: _torontoLocation,
+            zoom: 15,
+          ),
+          // markers: {
+          //   Marker(
+          //       markerId: const MarkerId("_currentLocation"),
+          //       icon: BitmapDescriptor.defaultMarkerWithHue(240),
+          //       position: _currentPosition!),
+          //   Marker(
+          //       markerId: const MarkerId("_sourceLocation"),
+          //       icon: BitmapDescriptor.defaultMarker,
+          //       position: randomRestaurantPosition!)
+          // },
+        ),
+        Positioned(
+          left: 16,
+          bottom: 16,
+          child: Card(
+            elevation: 8.0,
+            clipBehavior: Clip.hardEdge,
+            color: Colors.black87,
+            child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                child: Wrap(
+                  children: [
+                    ListTile(
+                      title: const Text(
+                        'Your ramdom nearby restaurant:',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w500),
+                      ),
+                      onTap: () async {
+                        await pickARandomRestaurant();
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.restaurant_rounded,
+                        color: Colors.white70,
+                      ),
+                      title: Text(
+                        randomRestaurant,
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w400),
+                      ),
+                      onTap: () async {
+                        await Clipboard.setData(
+                            ClipboardData(text: randomRestaurant));
+                      },
+                    )
+                  ],
+                )),
+          ),
+        ),
+      ]),
     );
   }
 
@@ -198,16 +209,24 @@ class _MapPageState extends State<MapPage> {
       }
     }
 
-    _locationController.onLocationChanged
-        .listen((LocationData currentLocation) {
-      if (currentLocation.latitude != null &&
-          currentLocation.longitude != null) {
-        setState(() {
-          _currentPosition =
-              LatLng(currentLocation.latitude!, currentLocation.longitude!);
-          _cameraToPosition(_currentPosition!);
-        });
-      }
-    });
+    // _locationController.onLocationChanged
+    //     .listen((LocationData currentLocation) {
+    //   if (currentLocation.latitude != null &&
+    //       currentLocation.longitude != null) {
+    //     setState(() {
+    //       _currentPosition =
+    //           LatLng(currentLocation.latitude!, currentLocation.longitude!);
+    //       _cameraToPosition(_currentPosition!);
+    //     });
+    //   }
+    // });
+    LocationData currentLocation = await _locationController.getLocation();
+    if (currentLocation.latitude != null && currentLocation.longitude != null) {
+      setState(() {
+        _currentPosition =
+            LatLng(currentLocation.latitude!, currentLocation.longitude!);
+        _cameraToPosition(_currentPosition!);
+      });
+    }
   }
 }

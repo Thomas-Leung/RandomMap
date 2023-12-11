@@ -1,5 +1,5 @@
-import 'package:random_map/Model/display_name.dart';
-import 'package:random_map/Model/location_model.dart';
+import 'package:random_map/models/display_name.dart';
+import 'package:random_map/models/location_model.dart';
 
 class Place {
   final String id;
