@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'package:random_map/models/place_model.dart';
 import 'package:random_map/widgets/random_result_widget.dart';
+import 'package:random_map/widgets/selection_fab.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -19,8 +20,6 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
   final Location _locationController = Location();
 
   static const LatLng _torontoLocation = LatLng(43.6510, -79.3470);
@@ -33,15 +32,10 @@ class _MapPageState extends State<MapPage> {
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
 
-  PersistentBottomSheetController? _bsController;
-
   @override
   void initState() {
     super.initState();
     getLocationUpdates();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showAppBottomSheet(context);
-    });
     // pickARandomRestaurant();
   }
 
@@ -92,15 +86,8 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton: Builder(builder: (context) {
-        return FloatingActionButton(
-            child: const Icon(Icons.search_rounded),
-            onPressed: () {
-              showAppBottomSheet(context);
-            });
-      }),
+      floatingActionButton: const SelectionFAB(),
       body: Stack(children: [
         ClipRRect(
           borderRadius:
@@ -167,43 +154,6 @@ class _MapPageState extends State<MapPage> {
             currentLocation.latitude! - 0.008, currentLocation.longitude!);
         _cameraToPosition(_currentPosition!);
       });
-    }
-  }
-
-  void showAppBottomSheet(BuildContext context) {
-    // https://stackoverflow.com/questions/65785802/flutterhow-to-show-modalbottomsheet-at-startup-without-any-button-click-i-want
-    // https://stackoverflow.com/questions/61557887/no-scaffold-widget-found-when-use-bottomsheet
-    _bsController = _scaffoldKey.currentState!.showBottomSheet<void>(
-      (BuildContext context) {
-        return Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.transparent),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-          height: 320,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const Text('BottomSheet'),
-                ElevatedButton(
-                  child: const Text('Close BottomSheet'),
-                  onPressed: () {
-                    closeAppBottomSheet();
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void closeAppBottomSheet() {
-    if (_bsController != null) {
-      _bsController!.close();
-      _bsController = null;
     }
   }
 }
