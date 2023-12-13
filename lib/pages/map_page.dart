@@ -60,22 +60,18 @@ class _MapPageState extends State<MapPage> {
         }
 
         return Stack(children: [
-          ClipRRect(
-            borderRadius:
-                const BorderRadius.vertical(bottom: Radius.circular(24)),
-            child: GoogleMap(
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                zoomControlsEnabled: false,
-                // save to our controller so we have access to the location
-                onMapCreated: ((GoogleMapController controller) =>
-                    _mapController.complete(controller)),
-                initialCameraPosition: const CameraPosition(
-                  target: _torontoLocation,
-                  zoom: 15,
-                ),
-                markers: markers),
-          ),
+          GoogleMap(
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              zoomControlsEnabled: false,
+              // save to our controller so we have access to the location
+              onMapCreated: ((GoogleMapController controller) =>
+                  _mapController.complete(controller)),
+              initialCameraPosition: const CameraPosition(
+                target: _torontoLocation,
+                zoom: 15,
+              ),
+              markers: markers),
           nearbySearchModel.randomRestaurant != null
               ? const RandomResultWidget()
               : Container()
@@ -115,7 +111,7 @@ class _MapPageState extends State<MapPage> {
     if (currentLocation.latitude != null && currentLocation.longitude != null) {
       setState(() {
         LatLng currPosition = LatLng(
-            currentLocation.latitude! - 0.008, currentLocation.longitude!);
+            currentLocation.latitude!, currentLocation.longitude!);
         // update the current posisiton without affecting the UI
         Provider.of<NearbySearchModel>(context, listen: false)
             .setCurrentPosition(currPosition);

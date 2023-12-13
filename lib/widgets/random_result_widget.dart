@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:random_map/models/nearby_search_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RandomResultWidget extends StatefulWidget {
   const RandomResultWidget({super.key});
@@ -123,7 +124,25 @@ class _RandomResultWidgetState extends State<RandomResultWidget> {
                                 foregroundColor: Colors.white,
                                 shadowColor: Colors.transparent,
                                 elevation: 0.0),
-                            onPressed: () {},
+                            onPressed: () async {
+                              Uri uri = Uri(
+                                  scheme: "google.navigation",
+                                  queryParameters: {
+                                    'q': nearbySearchModel
+                                        .randomRestaurant!.formattedAddress
+                                  });
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri);
+                              } else {
+                                // open browser
+                                uri = Uri(
+                                    scheme: 'https',
+                                    host: 'www.google.com',
+                                    path:
+                                        'maps/place/${nearbySearchModel.randomRestaurant!.formattedAddress}');
+                                await launchUrl(uri);
+                              }
+                            },
                             icon: Icon(Icons.arrow_forward_rounded),
                             label: Text("Get direction")),
                       ),

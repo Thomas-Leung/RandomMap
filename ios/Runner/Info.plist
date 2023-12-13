@@ -51,5 +51,12 @@
 	<string>Want to display location on map, and track it.</string>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+		<string>comgooglemaps-x-callback</string>
+		<string>http</string>
+		<string>https</string>
+	</array>
 </dict>
 </plist>
