@@ -12,7 +12,7 @@ class SelectionFAB extends StatefulWidget {
 class _SelectionFABState extends State<SelectionFAB> {
   late FloatingActionButton customFAB;
   PersistentBottomSheetController? _bsController;
-  double distance = 3350;
+  double distance = 3000;
   List<List> types = [
     ["Coffee", Icons.local_cafe_outlined],
     ["Light", Icons.lunch_dining_outlined],
@@ -123,10 +123,10 @@ class _SelectionFABState extends State<SelectionFAB> {
                         onChanged: (newDistance) {
                           setState(() => distance = newDistance);
                         },
-                        min: 500,
+                        min: 1000,
                         max: 10000,
                         label: "${distance.toInt()}",
-                        divisions: 10,
+                        divisions: 9,
                       ),
                       SizedBox(
                         width: double.infinity,

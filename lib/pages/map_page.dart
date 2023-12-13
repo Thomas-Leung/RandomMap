@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:random_map/models/nearby_search_model.dart';
+import 'package:random_map/widgets/message_widget.dart';
 
 import 'package:random_map/widgets/random_result_widget.dart';
 import 'package:random_map/widgets/selection_fab.dart';
@@ -29,15 +30,29 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    getLocationUpdates();
+    initLocation();
   }
 
   @override
   Widget build(BuildContext context) {
     Set<Marker> markers = {};
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
-      floatingActionButton: const SelectionFAB(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      floatingActionButton: Column(
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              getLocationUpdates();
+            },
+            backgroundColor: Colors.white,
+            child: const Icon(Icons.my_location_outlined),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          const SelectionFAB()
+        ],
+      ),
       body: Consumer<NearbySearchModel>(
           builder: (context, nearbySearchModel, child) {
         if (kIsWeb) {
@@ -62,7 +77,7 @@ class _MapPageState extends State<MapPage> {
         return Stack(children: [
           GoogleMap(
               myLocationEnabled: true,
-              myLocationButtonEnabled: true,
+              myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
               // save to our controller so we have access to the location
               onMapCreated: ((GoogleMapController controller) =>
@@ -74,28 +89,7 @@ class _MapPageState extends State<MapPage> {
               markers: markers),
           nearbySearchModel.randomRestaurant != null
               ? const RandomResultWidget()
-              : Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 32),
-                    child: ClipRRect(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(16.0)),
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 600),
-                        color: Colors.white.withOpacity(0.97),
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Text(
-                            nearbySearchModel.msg,
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              : const MessageWidget()
         ]);
       }),
     );
@@ -109,7 +103,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Future<void> getLocationUpdates() async {
+  Future<void> initLocation() async {
     bool serviceEnabled;
     PermissionStatus permissionGranted;
 
@@ -127,17 +121,20 @@ class _MapPageState extends State<MapPage> {
         return;
       }
     }
+  }
 
+  void getLocationUpdates() async {
     LocationData currentLocation = await _locationController.getLocation();
     if (currentLocation.latitude != null && currentLocation.longitude != null) {
-      setState(() {
-        LatLng currPosition =
-            LatLng(currentLocation.latitude!, currentLocation.longitude!);
-        // update the current posisiton without affecting the UI
-        Provider.of<NearbySearchModel>(context, listen: false)
-            .setCurrentPosition(currPosition);
-        _cameraToPosition(currPosition);
-      });
+      LatLng currPosition =
+          LatLng(currentLocation.latitude!, currentLocation.longitude!);
+
+      if (!context.mounted) return;
+      // update the current posisiton without affecting the UI
+      Provider.of<NearbySearchModel>(context, listen: false)
+          .setCurrentPosition(currPosition);
+      _cameraToPosition(
+          LatLng(currPosition.latitude - 0.008, currPosition.longitude));
     }
   }
 }

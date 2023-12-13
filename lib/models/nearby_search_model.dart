@@ -30,7 +30,7 @@ class NearbySearchModel extends ChangeNotifier {
       case "Restaurant":
         List templist = PlaceTypes().getRestaurants();
         for (var i = 0; i < 5; i++) {
-          templist[Random().nextInt(templist.length)];
+          includedTypes.add(templist[Random().nextInt(templist.length)]);
         }
         break;
       default:
@@ -64,7 +64,8 @@ class NearbySearchModel extends ChangeNotifier {
       double distance, String selectedType) async {
     if (prevPosition == currPosition &&
         prevDistance == distance &&
-        prevSelectedType == selectedType) {
+        prevSelectedType == selectedType &&
+        nearbyRestaurants.isNotEmpty) {
       randomRestaurant =
           nearbyRestaurants[Random().nextInt(nearbyRestaurants.length)];
       notifyListeners();
