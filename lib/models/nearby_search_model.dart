@@ -6,15 +6,36 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:random_map/models/place_model.dart';
+import 'package:random_map/models/place_types_model.dart';
 
 class NearbySearchModel extends ChangeNotifier {
-  int test = 0;
-  LatLng currentPosition = const LatLng(43.6510, -79.3470);
+  LatLng? prevPosition;
+  double? prevDistance;
+  String? prevSelectedType;
+  LatLng currPosition = const LatLng(43.6510, -79.3470);
   List<Place> nearbyRestaurants = [];
   Place? randomRestaurant;
   LatLng? randomRestaurantPosition;
+  String msg = "Tap the search icon to search for food";
 
-  Future<http.Response> searchNearbyRestaurants(LatLng latLng) {
+  Future<http.Response> searchNearbyRestaurants(
+      LatLng latLng, double distance, String selectedType) {
+    List includedTypes = [];
+    switch (selectedType) {
+      case "Coffee":
+        includedTypes = PlaceTypes().getCoffee();
+        break;
+      case "Light":
+        includedTypes = PlaceTypes().getLightFood();
+      case "Restaurant":
+        List templist = PlaceTypes().getRestaurants();
+        for (var i = 0; i < 5; i++) {
+          templist[Random().nextInt(templist.length)];
+        }
+        break;
+      default:
+        includedTypes = ["restaurant"];
+    }
     return http.post(
       Uri.parse('https://places.googleapis.com/v1/places:searchNearby'),
       headers: <String, String>{
@@ -24,7 +45,7 @@ class NearbySearchModel extends ChangeNotifier {
             'places.id,places.location,places.displayName,places.formattedAddress,places.rating,places.userRatingCount'
       },
       body: jsonEncode(<String, dynamic>{
-        "includedTypes": ["restaurant"],
+        "includedTypes": includedTypes,
         'maxResultCount': 20,
         "locationRestriction": {
           "circle": {
@@ -32,30 +53,47 @@ class NearbySearchModel extends ChangeNotifier {
               "latitude": latLng.latitude,
               "longitude": latLng.longitude
             },
-            "radius": 2000.0
+            "radius": distance
           }
         }
       }),
     );
   }
 
-  Future<void> pickARandomRestaurant() async {
-    http.Response response = await searchNearbyRestaurants(currentPosition);
+  Future<void> pickARandomRestaurant(
+      double distance, String selectedType) async {
+    if (prevPosition == currPosition &&
+        prevDistance == distance &&
+        prevSelectedType == selectedType) {
+      randomRestaurant =
+          nearbyRestaurants[Random().nextInt(nearbyRestaurants.length)];
+      notifyListeners();
+      return;
+    }
+    http.Response response =
+        await searchNearbyRestaurants(currPosition, distance, selectedType);
     if (response.statusCode == 200) {
+      prevPosition = currPosition;
+      prevDistance = distance;
+      prevSelectedType = selectedType;
       Map<String, dynamic> result =
           jsonDecode(response.body) as Map<String, dynamic>;
+      if (result.isEmpty) {
+        msg = "Oops, can't find any result, try further distance.";
+        notifyListeners();
+        return;
+      }
       nearbyRestaurants = List<Place>.from(
           result["places"].map((model) => Place.fromJson(model)));
       randomRestaurant =
           nearbyRestaurants[Random().nextInt(nearbyRestaurants.length)];
-      notifyListeners();
     } else {
       throw Exception('Failed to load nearby restaurants');
     }
     notifyListeners();
   }
 
-  void setCurrentPosition(LatLng currentPosition) {
-    this.currentPosition = currentPosition;
+  void setCurrentPosition(LatLng currPosition) {
+    this.currPosition = currPosition;
   }
 }

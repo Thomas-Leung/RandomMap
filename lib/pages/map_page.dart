@@ -44,7 +44,7 @@ class _MapPageState extends State<MapPage> {
           markers.add(Marker(
               markerId: const MarkerId("_currentLocation"),
               icon: BitmapDescriptor.defaultMarkerWithHue(240),
-              position: nearbySearchModel.currentPosition));
+              position: nearbySearchModel.currPosition));
         }
         if (nearbySearchModel.randomRestaurant != null) {
           LatLng position = LatLng(
@@ -74,7 +74,28 @@ class _MapPageState extends State<MapPage> {
               markers: markers),
           nearbySearchModel.randomRestaurant != null
               ? const RandomResultWidget()
-              : Container()
+              : Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 32),
+                    child: ClipRRect(
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(16.0)),
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        color: Colors.white.withOpacity(0.97),
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Text(
+                            nearbySearchModel.msg,
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
         ]);
       }),
     );
@@ -110,8 +131,8 @@ class _MapPageState extends State<MapPage> {
     LocationData currentLocation = await _locationController.getLocation();
     if (currentLocation.latitude != null && currentLocation.longitude != null) {
       setState(() {
-        LatLng currPosition = LatLng(
-            currentLocation.latitude!, currentLocation.longitude!);
+        LatLng currPosition =
+            LatLng(currentLocation.latitude!, currentLocation.longitude!);
         // update the current posisiton without affecting the UI
         Provider.of<NearbySearchModel>(context, listen: false)
             .setCurrentPosition(currPosition);
