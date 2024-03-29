@@ -1,20 +1,20 @@
 # random_map
+Random Map is an application designed to assist in restaurant selection based on your nearby location. 
 
-A new Flutter project.
+I developed this app because my friends and I often struggle to choose what to eat when we hang out.
 
-## Getting Started
+## Features
+- Select a restaurant based of types and distance.
+- Show direction.
+- User has the option to reselect another restaurant.
 
-This project is a starting point for a Flutter application.
+<video width="360" height="640" controls>
+  <source src="screenshots/video.mp4" type="video/mp4">
+</video>
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+### Miscellaneous
 Tutorial:
-[Google Map Setup](https://www.youtube.com/watch?v=LnZyorDeLmQ)
-[Google Map Basics](https://www.youtube.com/watch?v=M7cOmiSly3Q)
+
+- [Google Map Setup](https://www.youtube.com/watch?v=LnZyorDeLmQ)
+
+- [Google Map Basics](https://www.youtube.com/watch?v=M7cOmiSly3Q)
