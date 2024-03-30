@@ -12,9 +12,11 @@ I developed this app because my friends and I often struggle to choose what to e
   <video src="https://github.com/Thomas-Leung/RandomMap/assets/32366586/d8bce9f4-edf9-4cfa-8dbf-4427170994cd"/>
 </div>
 
-### Miscellaneous
-Tutorial:
+## Future ideas
+- Pick a restaurant based on the places you like.
+- Pick a restaurant that you haven't tried before.
 
+### Miscellaneous
 - [Google Map Setup](https://www.youtube.com/watch?v=LnZyorDeLmQ)
 
 - [Google Map Basics](https://www.youtube.com/watch?v=M7cOmiSly3Q)
