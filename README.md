@@ -8,7 +8,9 @@ I developed this app because my friends and I often struggle to choose what to e
 - Show direction.
 - User has the option to reselect another restaurant.
 
-https://github.com/Thomas-Leung/RandomMap/assets/32366586/d8bce9f4-edf9-4cfa-8dbf-4427170994cd
+<div align="center">
+  <video src="https://github.com/Thomas-Leung/RandomMap/assets/32366586/d8bce9f4-edf9-4cfa-8dbf-4427170994cd"/>
+</div>
 
 ### Miscellaneous
 Tutorial:
